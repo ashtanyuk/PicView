@@ -17,8 +17,11 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import java.io.*;
 import javafx.geometry.Insets;
+import javafx.stage.DirectoryChooser;
+import java.net.*;
 
 public class PicView extends Application {
+  private File folder;
 
 	public static List<String> list = new ArrayList<>();
 
@@ -33,8 +36,6 @@ public class PicView extends Application {
 
   @Override
   public void start(Stage stage) {
-    
-
     HBox root = new HBox();
     VBox left = new VBox();
     ImageView iv = new ImageView();
@@ -46,7 +47,10 @@ public class PicView extends Application {
             @Override
             public void handle(ActionEvent event) {
                 try {
-                   File folder = new File("pics/");
+
+                   DirectoryChooser dc = new DirectoryChooser();
+                   folder=dc.showDialog(stage);
+
                    String[] files = folder.list(new FilenameFilter(){
                      @Override 
                      public boolean accept(File folder, String name) {
@@ -68,7 +72,21 @@ public class PicView extends Application {
         .addListener(new ChangeListener<String>() {
           public void changed(ObservableValue<? extends String> observable,
               String oldValue, String newValue) {
-            Image image = new Image("pics/"+newValue);
+            String fullName=folder.toString()+"/"+newValue;
+            File pic=new File(fullName);
+            Image image=null;
+
+            try {
+              //image = new Image(fullName);
+              image=new Image(pic.toURI().toURL().toString());
+            }
+            catch(MalformedURLException e) {
+              System.out.println(e);
+            }
+            catch(IllegalArgumentException e) {
+              System.out.println(e);
+            }
+
             iv.setImage(image);
             iv.setFitHeight(500);
             iv.setFitWidth(625);
